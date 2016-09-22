@@ -1,0 +1,211 @@
+<?php if($this->uri->uri_string()=='order/recived_order_list' || $this->uri->uri_string()=='order/order_list' ){?>
+
+<script src="<?php echo base_url()?>js/jquery-ui.js"></script>
+  <link rel="stylesheet" type="text/css" href="<?php echo base_url();?>jQuery/src/jquery.tagger.css" />
+  <script src="<?php echo base_url();?>jQuery/src/jquery.tagger.js"></script>
+  <script src="<?php echo base_url();?>jQuery/src/jquery.ddslick.js"></script>
+
+<?php }?>
+
+<section class="main-header hidden-xs">
+<?php 
+
+	$sub_menu=array();
+	$sub_menu['dashboard']['menu']=array("dashboard","balance_manager","history","despute/receive_list");
+	$sub_menu['dashboard']['icon']=array("fa fa-file-text","fa fa-download","fa fa-history","fa fa-th-list");
+	$sub_menu['dashboard']['title']=array("Overview","Deposit Fund","Transaction History","Dispute Resolution");
+	
+	$sub_menu['order/order_list']['menu']=array("order/order_list");
+	$sub_menu['order/order_list']['icon']=array("fa fa-external-link");
+	$sub_menu['order/order_list']['title']=array("Placed Order");	
+	
+	$sub_menu['order/recived_order_list']['menu']=array("order/recived_order_list");
+	$sub_menu['order/recived_order_list']['icon']=array("fa fa-file-text");
+	$sub_menu['order/recived_order_list']['title']=array("Received Order");
+	
+	$sub_menu['send_money']['menu']=array("send_money","request_money","invoice","invoice/list_all");
+	$sub_menu['send_money']['icon']=array("glyphicon glyphicon-export","glyphicon glyphicon-import ","glyphicon glyphicon-list-alt ","fa fa-user","th-list");
+	$sub_menu['send_money']['title']=array("Send Money","Request Money","Create Invoice","My Invoices");
+	
+	
+	$sub_menu['notification']['menu']=array("notification");
+	$sub_menu['notification']['icon']=array("fa fa-bell");
+	$sub_menu['notification']['title']=array("Notification");	
+	
+	$sub_menu['despute']['menu']=array("despute");
+	$sub_menu['despute']['icon']=array("fa fa-th-list");
+	$sub_menu['despute']['title']=array("Dispute");	
+	
+?>
+<div class="container">
+	<!--box-menu-active-->
+	<div class="row">
+	<div class="col-md-12 ">
+		<?php foreach($sub_menu[$this->session->userdata("page_key")]['menu'] as $mkey=> $s_m){ 
+			if($s_m==$this->uri->uri_string())
+			$this->session->set_userdata("sub_menu_active",$s_m);
+		}
+		?>
+		<?php if($this->uri->uri_string()=='despute/receive_list' || $this->uri->uri_string()=='despute/generate_list'){?>
+			<div class=" col-sm-2 col-md-2  text-center box-menu-active">
+			<a  class="menu" href=""><span class="icon"><i class="fa fa-th-list animated fadeInDown"></i></span><span class="animated fadeInUp">Dispute Resolution </span></a>
+			</div>
+		<?php } else {?>
+		<?php foreach($sub_menu[$this->session->userdata("page_key")]['menu'] as $mkey=> $s_m){?>
+		<div class=" col-sm-2 col-md-2  text-center <?php if($this->session->userdata("sub_menu_active")==$s_m) echo "box-menu-active"; else echo "box-menu"; ?>">
+		<a  class="menu" href="<?php echo site_url($s_m);?>"><span class="icon"><i class="<?php echo $sub_menu[$this->session->userdata("page_key")]['icon'][$mkey]; ?> animated fadeInDown"></i></span><span class="animated fadeInUp"><?php echo $sub_menu[$this->session->userdata("page_key")]['title'][$mkey]; ?> </span></a>
+		</div>
+		
+		<?php } ?>
+		<?php } ?>
+		
+		<?php if($this->session->userdata('page_name')=='SendPayment' || $this->session->userdata('page_name')=='RequestPayment'){
+			?>
+		<div class="col-sm-6 col-md-6  box-menu">
+			<form class="form-inline search-block">
+			<select class="btn-search" id="myDropdown" style="display:none;"></select>
+				<ul class="dropdown-menu  ul-search">
+				<li class=""><a ><i class="fa fa-shopping-cart"></i></span>Product</a></li>
+				<li><a ><i class="fa  fa-gears"></i></span>Service</a></li>
+				</ul>
+			   
+			  
+        <select name="ajaxselect" id="ajaxselect" size="20" style="display: none;" ></select>
+        <script>
+		/* function  selected()
+		{
+			var selected_text =$("#ajaxselect option:selected").text(); 
+			var selected_type =$("#ajaxselect option:selected").val().split("_"); 
+			selected_type=selected_type[0];
+			//alert(selected_type);
+		} */
+          $(function(){		
+		
+			var urlauto='<?php echo base_url();?>order/<?php echo $this->uri->uri_string()=='order/recived_order_list'?'autocomplete_payee':'autocomplete';?>';
+		
+		  
+           
+			var ddBasic = [
+				{ text: "Product", value: 0,imageSrc:'<?php echo base_url(); ?>img/product.png' },
+				{ text: "Service", value: 1, imageSrc:'<?php echo base_url(); ?>img/services.png'},
+				
+			];
+			
+			$('#myDropdown').ddslick({
+				width:130,
+				data: ddBasic,
+				onSelected: function(selectedData){
+					$("#myDropdown").addClass("pull-left");
+					$("#search_by_text").show();
+					$(".filtertxt").val('');
+					
+				  var dd = $('#myDropdown .dd-selected-value').val();
+				 
+				  $('#myDropdown .dd-selected').addClass('btn-search');
+				  $(".serch-list").html('<li class="extra sr-tital missing">Record not found</li>');
+				  $('#ajaxselect').tagger({
+					  ajaxURL: urlauto + '/'+dd+'/'
+					, baseURL: '<?php echo base_url();?>img/'
+					, characterThreshold: 1
+					, fieldWidth: null
+				});
+				$(".suggestions li").addClass("sr-tital");
+				 //alert($('#myDropdown li:has(input[value="'+dd+'"])').index());
+				}   
+			});
+			 
+          });
+        </script>
+     <style>
+	 .btn-search{padding:15px!important;}
+	 .dd-selected{font-weight:normal!important;}
+	 .dd-selected-text,.dd-option-text{line-height:14px!important;}
+	 .dd-option-image, .dd-selected-image{max-width:22px; margin-top:-5px;}
+     </style>
+			   <button type="button" class="btn icon-btn-search" id="search_by_text"  style="display:none;"><i class="fa fa-search"></i></button>
+		    </form>
+		</div>
+			
+		
+		<?php }?>
+		<div class=" col-sm-4  col-md-4  text-right pull-right ">
+		
+		<span class="text-white m_top">Welcome <?php echo $this->session->userdata("first_name"); ?>!</span><br>
+		
+		<?php if($this->uri->uri_string()=='despute' || strstr($this->uri->uri_string(),'despute/final_offer')|| strstr($this->uri->uri_string(),'despute/negotiate')){?>
+		<span class="text-white margin-up"><?php echo 'Dispute'; ?></span>
+		<?php }else{?>
+		<span class="text-white animated fadeInRight font28 margin-up"><?php echo $this->session->userdata("page_name")!=''?$this->session->userdata("page_name"): $this->session->userdata("page_key"); ?></span>
+		<?php }?><br>
+		<?php if($this->uri->uri_string()!='dashboard'){?>
+		<span class="text-white curr_bal_menu" style="font-size:14;"></span><br>
+		<?php }?>
+		
+		<span class="text-orange  " style="font-weight:200;font-size:14px">You have xx open dispute(s), xx:yy:zz remaining</span>
+		</div>
+		
+	</div>
+	<!--<div class="col-md-2 text-center ">
+	
+	<span class="text-white"><h3>Welcome Nik!</h3></span>
+	<span class=""><h2>My Account</h2></span>
+	
+	</div> -->
+	<div class="col-xs-12 visible-xs">
+		
+	</div>
+
+	</div >
+	
+</div>	
+</section>
+
+<script>
+$("#exampleInputEmail3").keyup(function(){
+	var ths= $(this).val();
+	
+})
+$(document).on("load",function(){
+	$(function(){
+		if($("#filter").val()=='vendor')
+		{
+			$(".seller").addClass('hidden');
+		}
+		else if($("#filter").val()=='seller')
+		{
+			
+			$(".vendor").addClass('hidden');
+		}
+	});
+});
+$(document).ready(function(){
+	$('.selectpicker').selectpicker();
+	
+	$("#filter").on("change",function(){
+		if($(this).val()=='vendor')
+		{
+			$("#filter").removeAttr("disabled");
+			$(".vendor").removeClass('hidden');
+			$(".seller").addClass('hidden');
+			$(".seller").removeAttr('selected');
+			$('#seller option[class="seller"]').removeAttr('selected');
+			$("#seller").parent().find('.bs-placeholder .filter-option').text("Please Select Store");
+			//$('#seller option[class="vendor"]:first').attr('selected',"selected");
+			//alert($("#seller option[class='vendor']:selected" ).text());
+		}
+		else if($("#filter").val()=='seller')
+		{
+			$("#filter").removeAttr("disabled");
+			$(".seller").removeClass('hidden');
+			$("#seller").parent().find('.bs-placeholder .filter-option').text("Please Select "+$("#filter option:selected").text());
+			$(".vendor").addClass('hidden');
+			$(".vendor").removeAttr('selected');
+			$('#seller option[class="vendor"]').removeAttr('selected');
+			//$('#seller option[class="seller"]:first').attr('selected',"selected");
+			//alert($("#seller option:selected" ).text());
+				
+		}
+	});
+});
+
+</script>
